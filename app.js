@@ -4,6 +4,9 @@ const bodyParser = require('body-parser')
 
 const app = express()
 
+// Importations des différentes routes
+const userRoutes = require('./routes/users')
+
 mongoose
   .connect('mongodb+srv://accessUser:5K7F9UgwbVvxcd3W@cluster0-ruufw.mongodb.net/test?retryWrites=true&w=majority', {
     useNewUrlParser: true,
@@ -20,5 +23,7 @@ app.use((req, res, next) => {
 })
 
 app.use(bodyParser.json())
+
+app.use('/api/auth', userRoutes)
 
 module.exports = app
