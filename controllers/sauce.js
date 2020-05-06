@@ -1,4 +1,5 @@
 const Sauce = require('../models/sauce')
+const fs = require('fs')
 
 // Create a sauce
 exports.createSauce = (req, res, next) => {
@@ -14,10 +15,39 @@ exports.createSauce = (req, res, next) => {
 }
 
 // Update a sauce
-exports.updateSauce = (req, res, next) => {}
+exports.updateSauce = (req, res, next) => {
+  const sauceObject = req.file
+    ? {
+        ...JSON.parse(req.body.sauce),
+        imageUrl: `${req.protocol}://${req.get('host')}/images/${
+          req.file.filename
+        }`
+      }
+    : { ...req.body }
+  Sauce.updateOne(
+    { _id: req.params.id },
+    { ...sauceObject, _id: req.params.id }
+  )
+    .then(() =>
+      res.status(200).json({ message: 'Sauce modified successfully' })
+    )
+    .catch(error => res.status(400).json({ error }))
+}
 
 // Delete a sauce
-exports.deleteSauce = (req, res, next) => {}
+exports.deleteSauce = (req, res, next) => {
+  Sauce.findOne({ _id: req.params.id })
+    .then(thing => {
+      const filename = thing.imageUrl.split('/images/')[1]
+      fs.unlink(`images/${filename}`, () => {
+        thing
+          .deleteOne({ _id: req.params.id })
+          .then(() => res.status(200).json({ message: 'Deleted' }))
+          .catch(error => res.status(400).json({ error }))
+      })
+    })
+    .catch(error => res.status(500).json({ error }))
+}
 
 // Get all sauces
 exports.getAllSauce = (req, res, next) => {
