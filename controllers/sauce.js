@@ -30,7 +30,7 @@ exports.likes = (req, res, next) => {
           { likes: sauce.usersLiked.length, usersLiked: sauce.usersLiked }
         )
           .then()
-          .catch()
+          .catch(error => res.status(500).json({ error }))
 
         // if like = -1, adding userId to usersDisliked and update dislikes
       } else if (req.body.like === -1) {
@@ -43,7 +43,7 @@ exports.likes = (req, res, next) => {
           }
         )
           .then()
-          .catch()
+          .catch(error => res.status(500).json({ error }))
 
         // if like = 0, removing userId from usersLike and usersDisliked and update dislikes
       } else if (req.body.like === 0) {
@@ -59,7 +59,7 @@ exports.likes = (req, res, next) => {
             }
           )
             .then()
-            .catch()
+            .catch(error => res.status(500).json({ error }))
         } else if (sauce.usersDisliked.includes(req.body.userId)) {
           const indexUserId = sauce.usersDisliked.indexOf(req.body.userId)
           sauce.usersDisliked.splice(indexUserId, 1)
@@ -83,11 +83,11 @@ exports.likes = (req, res, next) => {
 exports.updateSauce = (req, res, next) => {
   const sauceObject = req.file
     ? {
-        ...JSON.parse(req.body.sauce),
-        imageUrl: `${req.protocol}://${req.get('host')}/images/${
+      ...JSON.parse(req.body.sauce),
+      imageUrl: `${req.protocol}://${req.get('host')}/images/${
           req.file.filename
         }`
-      }
+    }
     : { ...req.body }
   Sauce.updateOne(
     { _id: req.params.id },
