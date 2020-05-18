@@ -12,7 +12,8 @@ const path = require('path')
 mongoose
   .connect('mongodb+srv://accessUser:5K7F9UgwbVvxcd3W@cluster0-ruufw.mongodb.net/sauce?retryWrites=true&w=majority', {
     useNewUrlParser: true,
-    useUnifiedTopology: true
+    useUnifiedTopology: true,
+    useCreateIndex: true
   })
   .then(() => console.log('Connection to database successful !'))
   .catch(() => console.log('Connection to database failed'))
