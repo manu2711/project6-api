@@ -29,7 +29,8 @@ exports.likes = (req, res, next) => {
           { _id: req.params.id },
           { likes: sauce.usersLiked.length, usersLiked: sauce.usersLiked }
         )
-          .then()
+
+          .then(res.status(200).json({ message: 'You liked the sauce' }))
           .catch(error => res.status(500).json({ error }))
 
         // if like = -1, adding userId to usersDisliked and update dislikes
@@ -42,7 +43,7 @@ exports.likes = (req, res, next) => {
             usersDisliked: sauce.usersDisliked
           }
         )
-          .then()
+          .then(res.status(200).json({ message: 'You did not like the sauce' }))
           .catch(error => res.status(500).json({ error }))
 
         // if like = 0, removing userId from usersLike and usersDisliked and update dislikes
@@ -58,7 +59,10 @@ exports.likes = (req, res, next) => {
               likes: sauce.usersLiked.length
             }
           )
-            .then()
+
+            .then(
+              res.status(200).json({ message: 'You did not give any feedback' })
+            )
             .catch(error => res.status(500).json({ error }))
         } else if (sauce.usersDisliked.includes(req.body.userId)) {
           const indexUserId = sauce.usersDisliked.indexOf(req.body.userId)
@@ -70,11 +74,12 @@ exports.likes = (req, res, next) => {
               dislikes: sauce.usersDisliked.length
             }
           )
-            .then()
-            .catch()
+            .then(
+              res.status(200).json({ message: 'You did not give any feedback' })
+            )
+            .catch(error => res.status(500).json({ error }))
         }
       }
-      res.status(200).json({ message: 'Thanks for your feedback ' })
     })
     .catch(error => res.status(500).json({ error }))
 }
@@ -83,11 +88,11 @@ exports.likes = (req, res, next) => {
 exports.updateSauce = (req, res, next) => {
   const sauceObject = req.file
     ? {
-      ...JSON.parse(req.body.sauce),
-      imageUrl: `${req.protocol}://${req.get('host')}/images/${
+        ...JSON.parse(req.body.sauce),
+        imageUrl: `${req.protocol}://${req.get('host')}/images/${
           req.file.filename
         }`
-    }
+      }
     : { ...req.body }
   Sauce.updateOne(
     { _id: req.params.id },
