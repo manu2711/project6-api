@@ -2,13 +2,15 @@ const User = require('../models/user')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 
-const registerValidation = require('../middleware/validation')
+const validation = require('../middleware/validation')
 
 // Création d'un nouvel utilisateur
 exports.signup = (req, res, next) => {
   // Validation des entrées utilisateur
-  const { error } = registerValidation(req.body)
-  if (error) return res.status(400).send(error.details[0].message)
+  const { error } = validation.register(req.body)
+  if (error) {
+    return res.status(400).send(error.details[0].message)
+  }
 
   bcrypt
     .hash(req.body.password, 10)

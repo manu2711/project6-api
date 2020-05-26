@@ -1,21 +1,30 @@
 const Sauce = require('../models/sauce')
 const fs = require('fs')
 
+const validation = require('../middleware/validation')
+
 // Create a sauce
 exports.createSauce = (req, res, next) => {
   const sauceObject = JSON.parse(req.body.sauce)
-  const sauce = new Sauce({
-    ...sauceObject,
-    imageUrl: `${req.protocol}://${req.get('host')}/images/${
-      req.file.filename
-    }`,
-    likes: 0,
-    dislikes: 0
-  })
-  sauce
-    .save()
-    .then(() => res.status(201).json({ message: 'Sauce correctly added !' }))
-    .catch(error => res.status(400).json({ error }))
+
+  // Validation des entrées utilisateur
+  const { error } = validation.sauce(sauceObject)
+  if (error) {
+    return res.status(400).send(error.details[0].message)
+  } else {
+    const sauce = new Sauce({
+      ...sauceObject,
+      imageUrl: `${req.protocol}://${req.get('host')}/images/${
+        req.file.filename
+      }`,
+      likes: 0,
+      dislikes: 0
+    })
+    sauce
+      .save()
+      .then(() => res.status(201).json({ message: 'Sauce correctly added !' }))
+      .catch(error => res.status(400).json({ error }))
+  }
 }
 
 // Gestion des Likes et Dislikes
